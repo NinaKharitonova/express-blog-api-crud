@@ -1,7 +1,10 @@
+require("dotenv").config();
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
-const port = 3002;
+const port = process.env.HOST_PORT;
+const domain = process.env.HOST_DOMAIN;
 
 app.use(express.static("public"));
 
@@ -13,6 +16,12 @@ app.use(express.json());
 
 // Middleware per leggere JSON dal corpo della richiesta
 app.use(bodyParser.json());
+
+//Middleware
+const checkTime = require("./middlewares/checkTime");
+app.use(checkTime);
+
+const errorsHandler = require("./middlewares/errorsHandler");
 
 // Router con il prefisso /posts
 app.use("/posts", postsRouter);
@@ -31,7 +40,10 @@ app.get("/blog", (req, res) => {
   res.json(date);
 });
 
+//Error handler
+app.use(errorsHandler);
+
 // Avvia il server
 app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
+  console.log(`App listening at ${domain}:${port}`);
 });
