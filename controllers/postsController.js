@@ -23,7 +23,9 @@ const show = (req, res) => {
   const post = posts.find((p) => p.id === id);
 
   if (!post) {
-    return res.status(404).json({ message: `Post con ID ${id} non trovato` });
+    const err = new Error(`Post con ID ${id} non trovato`);
+    err.code = 404;
+    throw err;
   }
 
   res.json(post);
@@ -39,6 +41,12 @@ module.exports = {
     module.exports = {
       store: (req, res) => {
         const { title, content, image, tags } = req.body;
+
+        if (!title || !content || !image || !tags?.length) {
+          const err = new Error("Parametro invalido");
+          err.code = 400;
+          throw err;
+        }
 
         const newPost = {
           title,
@@ -72,7 +80,9 @@ module.exports = {
     const post = posts.find((p) => p.id === postId);
 
     if (!post) {
-      return res.status(404).json({ message: "Post non trovato!" });
+      const err = new Error("Post non trovato!");
+      err.code = 404;
+      throw err;
     }
 
     if (title) post.title = title;
@@ -94,7 +104,9 @@ const destroy = (req, res) => {
   const index = posts.findIndex((p) => p.id === id);
 
   if (index === -1) {
-    return res.status(404).json({ message: `Post con ID ${id} non trovato` });
+    const err = new Error(`Post con ID ${id} non trovato`);
+    err.code = 404;
+    throw err;
   }
 
   posts.splice(index, 1);
